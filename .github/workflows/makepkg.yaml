@@ -1,0 +1,57 @@
+name: Make Archlinux Package Repository
+
+on:
+  push:
+  schedule:
+    - cron: "37 5 * * 0"
+
+jobs:
+  build_repository:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get current time and date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
+
+    - name: Build Packages
+      uses: nafets227/build-aur-packages@v0.1
+      with:
+        packages: >
+          blktrace
+        #dummy: >
+        #  # these packages will be built later
+        #  dhtest
+        #  dropwatch
+        #  shim-signed
+        #  splunk-forwarder
+        #  td-agent
+        #  vdr
+        #  vdr-epgsearch
+        #  vdr-remote
+        #  vdr-satip
+        #  perl-template-plugin-javascript
+        #  vdradmin-am
+        #  xlogin
+        #  virtio-win
+        #dummy2: >
+        #  # these packages have different source than official AUR
+        #  dhtest https://github.com/nafets227/dhtest.aur.git
+    #- name: List generated Files
+    #  run: ls -1 > ${{ github.workspace }}/files.txt
+    #- name: Remove the current data from the release
+    #  uses: kopp/action-delete-release@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #  with:
+    #    tag_name: aurci2
+    - name: Upload Files to Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "${{ steps.init.outputs.branch-prefix }}${{ steps.init.outputs.date }}"
+        body: ${{ github.repository }} build ${{ github.run_number }} for ${{ github.ref_name }} from ${{ steps.init.outputs.date }}
+        files: |
+          ${{ github.workspace }}/*
+        prerelease: ${{ steps.init.outputs.branch-prefix != '' }}
+        target_commitish: ${{ github.ref_name }}

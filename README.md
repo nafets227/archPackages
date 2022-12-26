@@ -20,5 +20,6 @@ pacman -S blktrace
 ```
 
 ## credits
-[nafets227/build-aur-packages](https://github.com/nafets227/internetBuild) forked from
+[nafets227/build-aur-packages](https://github.com/nafets227/build-aur-packages)
+forked from
 [kopp/build-aur-packages](https://github.com/kopp/build-aur-packages)

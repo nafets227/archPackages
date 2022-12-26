@@ -2,6 +2,10 @@ name: Make Archlinux Package Repository
 
 on:
   push:
+    branches:
+    - '**'
+    tags-ignore:
+    - '**'
   schedule:
     - cron: "37 5 * * 0"
 

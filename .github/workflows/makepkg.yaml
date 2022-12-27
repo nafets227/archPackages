@@ -54,21 +54,19 @@ jobs:
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         packages: >
           blktrace
-        #dummy: >
-        #  # these packages will be built later
-        #  dhtest
-        #  dropwatch
-        #  shim-signed
-        #  splunk-forwarder
-        #  td-agent
-        #  vdr
-        #  vdr-epgsearch
-        #  vdr-remote
-        #  vdr-satip
-        #  perl-template-plugin-javascript
-        #  vdradmin-am
-        #  xlogin
-        #  virtio-win
+          dhtest
+          dropwatch
+          shim-signed
+          splunk-forwarder
+          td-agent
+          vdr
+          vdr-epgsearch
+          vdr-remote
+          vdr-satip
+          perl-template-plugin-javascript
+          vdradmin-am
+          xlogin
+          virtio-win
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git

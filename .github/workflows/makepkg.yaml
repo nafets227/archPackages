@@ -27,13 +27,16 @@ jobs:
         else
           branch_prefix="${{ github.ref_name }}-"
         fi
+        reponame="${GITHUB_REPOSITORY##*/}"
         branch_prev=$(git -C src tag -l "${branch_prefix}2*" | tail -1)
         tag_date="$(date +'%Y%m%d-%H%M%S')"
         rm -rf src
         echo "Date used for tagging: $tag_date"
+        echo "Repo name: $reponame"
         echo "Branch prefix: $branch_prefix"
         echo "Previous release: $branch_prev"
         echo "date=$tag_date" >>$GITHUB_OUTPUT
+        echo "reponame=$reponame" >>$GITHUB_OUTPUT
         echo "branch-prefix=$branch_prefix" >>$GITHUB_OUTPUT
         echo "branch-prev=$branch_prev" >>$GITHUB_OUTPUT
     - name: download previous release
@@ -48,6 +51,7 @@ jobs:
       uses: nafets227/build-aur-packages@v0.1
       with:
         keep: true
+        reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         packages: >
           blktrace
         #dummy: >

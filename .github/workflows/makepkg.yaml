@@ -48,7 +48,7 @@ jobs:
         filename: "*"
     - name: Build Packages
       id: build
-      uses: nafets227/build-aur-packages@v0.1
+      uses: nafets227/build-aur-packages@v0.2
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'

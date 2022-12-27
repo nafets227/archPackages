@@ -70,14 +70,6 @@ jobs:
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
-    #- name: List generated Files
-    #  run: ls -1 > ${{ github.workspace }}/files.txt
-    #- name: Remove the current data from the release
-    #  uses: kopp/action-delete-release@v1
-    #  env:
-    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #  with:
-    #    tag_name: aurci2
     - name: Upload Files to Release
       if: ${{ steps.build.outputs.updated == 'true' }}
       uses: softprops/action-gh-release@v1

@@ -11,10 +11,20 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Allow one concurrent deployment
+concurrency:
+  group: "branch-${{ github.ref_name }}"
+  cancel-in-progress: false
 
 jobs:
-  build_repository:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      updated: ${{
+        steps.build1.outputs.updated == 'true' ||
+        steps.build2.outputs.updated == 'true' }}
+      branch-prefix: ${{ steps.init.outputs.branch-prefix }}
+      date: ${{ steps.init.outputs.date}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -33,6 +43,7 @@ jobs:
         reponame="${GITHUB_REPOSITORY##*/}"
         branch_prev=$(git -C src tag -l "${branch_prefix}2*" | tail -1)
         tag_date="$(date +'%Y%m%d-%H%M%S')"
+        cp -a src/index.html .
         rm -rf src
         echo "Date used for tagging: $tag_date"
         echo "Repo name: $reponame"
@@ -49,21 +60,28 @@ jobs:
       with:
         tag: ${{ steps.init.outputs.branch-prev }}
         filename: "*"
+    - name: Build vdr Package (prereq for other pkgs)
+      id: build1
+      uses: nafets227/build-aur-packages@dev
+      with:
+        keep: true
+        reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
+        packages: >
+          vdr
     - name: Build Packages
-      id: build
+      id: build2
       uses: nafets227/build-aur-packages@v0.2
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         packages: >
+          vdr-epgsearch
           blktrace
           dhtest
           dropwatch
           shim-signed
           splunk-forwarder
           td-agent
-          vdr
-          vdr-epgsearch
           vdr-remote
           vdr-satip
           perl-template-plugin-javascript
@@ -73,15 +91,38 @@ jobs:
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
+    - name: Upload Result to gh Artifact
+      if: ${{
+        steps.build1.outputs.updated == 'true' ||
+        steps.build2.outputs.updated == 'true' }}
+      id: upload
+      uses: actions/upload-pages-artifact@v1.0.7
+      with:
+        path: ${{ github.workspace }}
+
+
+  release:
+    needs: build
+    if: ${{ needs.build.outputs.updated == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v3.0.1
+      with:
+        name: github-pages
+        path: ${{ github.workspace }}
+    - name: unpack
+      run: |
+        tar xvf artifact.tar
+        rm artifact.tar
     - name: Upload Files to Release
-      if: ${{ steps.build.outputs.updated == 'true' }}
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: "${{ steps.init.outputs.branch-prefix }}${{ steps.init.outputs.date }}"
-        body: ${{ github.repository }} build ${{ github.run_number }} for ${{ github.ref_name }} from ${{ steps.init.outputs.date }}
+        tag_name: "${{ needs.build.outputs.branch-prefix }}${{ needs.build.outputs.date }}"
+        body: ${{ github.repository }} build ${{ github.run_number }} for ${{ github.ref_name }} from ${{ needs.build.outputs.date }}
         files: |
           ${{ github.workspace }}/*
-        prerelease: ${{ steps.init.outputs.branch-prefix != '' }}
+        prerelease: ${{ needs.build.outputs.branch-prefix != '' }}
         target_commitish: ${{ github.ref_name }}

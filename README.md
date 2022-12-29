@@ -6,7 +6,7 @@ repository, that used to do a similar job on local Jenkins.
 ## usage
 edit /etc/pacman.conf and append the config for our repo
 ```
-[aurci2]
+[nafets227-archPackages]
 Server = https://github.com/nafets227/archPackages/releases/latest/download
 ```
 After that, running

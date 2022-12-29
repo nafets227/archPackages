@@ -103,7 +103,7 @@ jobs:
 
   release:
     needs: build
-    if: ${{ needs.build.outputs.updated == 'true' }}
+    if: ${{ needs.build.outputs.updated == 'true' && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
     - name: Download Artifact

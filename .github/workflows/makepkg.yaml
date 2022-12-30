@@ -78,6 +78,7 @@ jobs:
           vdr-epgsearch
           blktrace
           dhtest
+          dhtest-git
           dropwatch
           shim-signed
           splunk-forwarder

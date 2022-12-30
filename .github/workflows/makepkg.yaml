@@ -62,7 +62,7 @@ jobs:
         filename: "*"
     - name: Build vdr Package (prereq for other pkgs)
       id: build1
-      uses: nafets227/build-aur-packages@v0.2
+      uses: nafets227/build-aur-packages@v0.3
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
@@ -70,7 +70,7 @@ jobs:
           vdr
     - name: Build Packages
       id: build2
-      uses: nafets227/build-aur-packages@v0.2
+      uses: nafets227/build-aur-packages@v0.3
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'

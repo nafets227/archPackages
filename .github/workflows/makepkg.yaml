@@ -20,9 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      updated: ${{
-        steps.build1.outputs.updated == 'true' ||
-        steps.build2.outputs.updated == 'true' }}
+      updated: ${{ steps.build.outputs.updated == 'true' }}
       branch-prefix: ${{ steps.init.outputs.branch-prefix }}
       date: ${{ steps.init.outputs.date}}
     steps:
@@ -61,7 +59,7 @@ jobs:
         tag: ${{ steps.init.outputs.branch-prev }}
         filename: "*"
     - name: Build Packages
-      id: build2
+      id: build
       uses: nafets227/build-aur-packages@v0.3
       with:
         keep: true
@@ -86,9 +84,7 @@ jobs:
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
     - name: Upload Result to gh Artifact
-      if: ${{
-        steps.build1.outputs.updated == 'true' ||
-        steps.build2.outputs.updated == 'true' }}
+      if: ${{ steps.build.outputs.updated == 'true' }}
       id: upload
       uses: actions/upload-pages-artifact@v1.0.7
       with:

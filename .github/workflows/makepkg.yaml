@@ -91,7 +91,7 @@ jobs:
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
-    - name: Upload Result to gh Artifact
+    - name: Upload Result (artifact.tar) as Workflow Artifact
       if: ${{ steps.build.outputs.updated == 'true' }}
       id: upload
       uses: actions/upload-pages-artifact@v1.0.7
@@ -104,12 +104,12 @@ jobs:
     if: ${{ needs.build.outputs.updated == 'true' && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Download Artifact
+    - name: Download Workflow Artifact (artifact.tar)
       uses: actions/download-artifact@v3.0.2
       with:
         name: github-pages
         path: ${{ github.workspace }}
-    - name: Upload Files to Release
+    - name: Upload File (artifact.tar) to Release
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

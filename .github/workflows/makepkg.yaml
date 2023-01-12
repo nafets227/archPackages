@@ -54,10 +54,18 @@ jobs:
     - name: download previous release
       id: download
       if: ${{ steps.init.outputs.branch-prev != '' }}
+      continue-on-error: true
       uses: robinraju/release-downloader@v1.7
       with:
         tag: ${{ steps.init.outputs.branch-prev }}
-        filename: "*"
+        filename: "artifact.tar"
+    - name: extract previous release
+      id: extract
+      if: ${{ steps.init.outputs.branch-prev != '' }}
+      continue-on-error: true
+      run: |
+        tar xvf artifact.tar
+        rm artifact.tar
     - name: Build Packages
       id: build
       uses: nafets227/build-aur-packages@v0.3
@@ -101,10 +109,6 @@ jobs:
       with:
         name: github-pages
         path: ${{ github.workspace }}
-    - name: unpack
-      run: |
-        tar xvf artifact.tar
-        rm artifact.tar
     - name: Upload Files to Release
       uses: softprops/action-gh-release@v1
       env:
@@ -113,7 +117,7 @@ jobs:
         tag_name: "${{ needs.build.outputs.branch-prefix }}${{ needs.build.outputs.date }}"
         body: ${{ github.repository }} build ${{ github.run_number }} for ${{ github.ref_name }} from ${{ needs.build.outputs.date }}
         files: |
-          ${{ github.workspace }}/*
+          ${{ github.workspace }}/artifact.tar
         prerelease: ${{ needs.build.outputs.branch-prefix != '' }}
         target_commitish: ${{ github.ref_name }}
 

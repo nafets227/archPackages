@@ -68,7 +68,7 @@ jobs:
         rm artifact.tar
     - name: Build Packages
       id: build
-      uses: nafets227/build-aur-packages@v0.3
+      uses: nafets227/build-aur-packages@v0.4
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'

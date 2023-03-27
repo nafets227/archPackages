@@ -94,7 +94,7 @@ jobs:
     - name: Upload Result (artifact.tar) as Workflow Artifact
       if: ${{ steps.build.outputs.updated == 'true' }}
       id: upload
-      uses: actions/upload-pages-artifact@v1.0.7
+      uses: actions/upload-pages-artifact@v1.0.8
       with:
         path: ${{ github.workspace }}
 

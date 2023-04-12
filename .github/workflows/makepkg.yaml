@@ -91,6 +91,7 @@ jobs:
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
+        #  mkinitcpio-addon-rootloop https://github.com/nafets227/mkinitcpio-addon-rootloop
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
       with:

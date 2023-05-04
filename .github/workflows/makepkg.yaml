@@ -55,7 +55,7 @@ jobs:
       id: download
       if: ${{ steps.init.outputs.branch-prev != '' }}
       continue-on-error: true
-      uses: robinraju/release-downloader@v1.7
+      uses: robinraju/release-downloader@v1.8
       with:
         tag: ${{ steps.init.outputs.branch-prev }}
         filename: "artifact.tar"

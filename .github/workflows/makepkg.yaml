@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      updated: ${{ steps.build.outputs.updated == 'true' }}
+      updated: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       branch-prefix: ${{ steps.init.outputs.branch-prefix }}
       date: ${{ steps.init.outputs.date}}
     steps:
@@ -29,7 +29,7 @@ jobs:
       with:
         fetch-depth: 0
         path: "src"
-    - name: Initialise and analyse
+    - name: Analyse
       id: init
       run: |
         set -o pipefail
@@ -41,8 +41,6 @@ jobs:
         reponame="${GITHUB_REPOSITORY##*/}"
         branch_prev=$(git -C src tag -l "${branch_prefix}2*" | tail -1)
         tag_date="$(date +'%Y%m%d-%H%M%S')"
-        cp -a src/index.html .
-        rm -rf src
         echo "Date used for tagging: $tag_date"
         echo "Repo name: $reponame"
         echo "Branch prefix: $branch_prefix"
@@ -68,10 +66,11 @@ jobs:
         rm artifact.tar
     - name: Build Packages
       id: build
-      uses: nafets227/build-aur-packages@v0.4
+      uses: nafets227/build-aur-packages@v0.5
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
+        repodir: 'x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         missing_aur_dependencies: vdr
         packages: >
           vdr-epgsearch
@@ -91,8 +90,36 @@ jobs:
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: "arm64"
+    - name: Build Packages for Raspberry
+      id: build-raspi
+      uses: nafets227/build-aur-packages@v0.5
+      with:
+        arch: "arm64"
+        arch-override: true
+        keep: true
+        reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
+        repodir: 'aarch64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
+        missing_aur_dependencies: vdr
+        packages: >
+          vdr-satip
+    - name: add index.html and compatibility (x86_64 in root)
+      if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
+      id: addindex
+      run: |
+        set -o pipefail
+        cp -a src/index.html .
+        rm -rf src
+        for f in "x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}"/*
+        do
+          rm "$(basename "$f")"
+          ln -s "$f" "$(basename "$f")"
+        done
     - name: Upload Result (artifact.tar) as Workflow Artifact
-      if: ${{ steps.build.outputs.updated == 'true' }}
+      if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       id: upload
       uses: actions/upload-pages-artifact@v1.0.9
       with:

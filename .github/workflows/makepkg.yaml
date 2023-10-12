@@ -116,7 +116,7 @@ jobs:
         rm -rf src
         for f in "x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}"/*
         do
-          rm "$(basename "$f")"
+          rm "$(basename "$f")" || true # ignore error
           ln -s "$f" "$(basename "$f")"
         done
     - name: Upload Result (artifact.tar) as Workflow Artifact

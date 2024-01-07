@@ -109,6 +109,9 @@ jobs:
         packages: >
           vdr-satip
           vdr-remote
+        # waiting for our update to be merged upstream.
+        # see https://github.com/nafets227/vdr-softhdcuvid.aur.git
+        # vdr-softhddrm 
     - name: add index.html and compatibility (x86_64 in root)
       if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       id: addindex

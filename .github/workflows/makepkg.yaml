@@ -73,20 +73,20 @@ jobs:
         repodir: 'x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         missing_aur_dependencies: vdr
         packages: >
-          vdr-epgsearch
           blktrace
           dhtest
           dhtest-git
           dropwatch
+          perl-template-plugin-javascript
           shim-signed
           splunkforwarder
           td-agent
+          vdr-epgsearch
           vdr-remote
           vdr-satip
-          perl-template-plugin-javascript
           vdradmin-am
-          xlogin
           virtio-win
+          xlogin
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git

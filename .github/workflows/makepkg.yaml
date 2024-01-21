@@ -84,6 +84,7 @@ jobs:
           vdr-epgsearch
           vdr-remote
           vdr-satip
+          vacuum
           vdradmin-am
           virtio-win
           xlogin

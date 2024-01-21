@@ -85,6 +85,8 @@ jobs:
           vdr-epgsearch
           vdr-remote
           vdr-satip
+          vdr-suspendoutput
+          vdr-dummydevice
           vdradmin-am
           virtio-win
           xlogin

@@ -81,7 +81,6 @@ jobs:
           shim-signed
           splunkforwarder
           td-agent
-          vdr-dummydevice
           vdr-epgsearch
           vdr-remote
           vdr-satip

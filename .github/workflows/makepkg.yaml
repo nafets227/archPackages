@@ -172,7 +172,7 @@ jobs:
     steps:
     - name: Setup Pages
       id: setup
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
     - name: Deploy to GitHub Pages
       id: deploy
       uses: actions/deploy-pages@v4

@@ -106,11 +106,8 @@ jobs:
         repodir: 'aarch64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         missing_aur_dependencies: vdr
         packages: >
-          vdr-satip
           vdr-remote
-          vdr-softhddevice-drm
           vdr-softhddevice-drm-gles
-          vdr-softhddrm
     - name: add index.html and compatibility (x86_64 in root)
       if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       id: addindex

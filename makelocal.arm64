@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# compile a package from the current directory instead of AUR
+
+# config
+BUILDAURTAG=nafets227/build-aur-packages@v0.7.2 &&
+PLATFORM=linux/arm64 &&
+
+# common variables
+OURSELVES=$(basename "${BASH_SOURCE[0]}") &&
+BUILDAURDIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")/build-aur-package &&
+true || exit 1
+
+# clone or fetch+checkout build-aur-packages.
+if [ -d "$BUILDAURDIR" ] ; then
+	git -C "$BUILDAURDIR" fetch --depth 1 origin "${BUILDAURTAG##*@}" &&
+	git -C "$BUILDAURDIR" checkout --detach "${BUILDAURTAG##*@}" &&
+	true || exit 1
+else
+	mkdir -p "$BUILDAURDIR" &&
+	git \
+		-c advice.detachedHead=false \
+		clone \
+		--depth 1 \
+		"https://github.com/${BUILDAURTAG%@*}" \
+		--branch "${BUILDAURTAG##*@}" \
+		"$BUILDAURDIR" \
+		&&
+	true || exit 1
+fi
+
+# Build our builder image
+docker build \
+	-t "build-aur-packges:$OURSELVES" \
+	--platform "$PLATFORM" \
+	"$BUILDAURDIR" \
+	&&
+
+# finally run makepkg inside the builder image
+docker run \
+	--platform "$PLATFORM" \
+	-v "$PWD:/home/builder" \
+	-i \
+	--user 1000 \
+	makepkg:local \
+	bash <<-EOF
+		cd &&
+		sudo bash -c "cat >>/etc/pacman.conf" <<-EOFPACMAN &&
+			[nafets227-archPackages]
+			SigLevel = Optional
+			Server = https://nafets227.github.io/archPackages/\\\$arch/\\\$repo
+			EOFPACMAN
+		sudo pacman -Sy &&
+		makepkg --noconfirm --log -s $@ </dev/null &&
+		makepkg --printsrcinfo >.SRCINFO
+		EOF

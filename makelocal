@@ -1,14 +1,24 @@
 #!/bin/bash
 
 # compile a package from the current directory instead of AUR
+# Parameters:
+#    1   - platform (as used by docker --platform)
+#    2ff - further parameters are handed over to makepkg.
+#          Common examples are -f --force --ignorearch
+if [ -z "$1" ] ; then
+	printf "Error: Missing platform (parm 1)\n"
+	exit 1
+fi
 
 # config
 BUILDAURTAG=nafets227/build-aur-packages@v0.7.2 &&
-PLATFORM=linux/arm64 &&
+PLATFORM="$1" &&
+shift &&
 
 # common variables
 OURSELVES=$(basename "${BASH_SOURCE[0]}") &&
 BUILDAURDIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")/build-aur-package &&
+BUILDAURIMG="ghcr.io/nafets227/build-aur-packages:local-$OURSELVES"
 true || exit 1
 
 # clone or fetch+checkout build-aur-packages.
@@ -31,7 +41,7 @@ fi
 
 # Build our builder image
 docker build \
-	-t "build-aur-packges:$OURSELVES" \
+	-t "$BUILDAURIMG" \
 	--platform "$PLATFORM" \
 	"$BUILDAURDIR" \
 	&&
@@ -42,7 +52,7 @@ docker run \
 	-v "$PWD:/home/builder" \
 	-i \
 	--user 1000 \
-	makepkg:local \
+	"$BUILDAURIMG" \
 	bash <<-EOF
 		cd &&
 		sudo bash -c "cat >>/etc/pacman.conf" <<-EOFPACMAN &&

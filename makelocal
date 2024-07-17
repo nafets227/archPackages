@@ -61,6 +61,7 @@ docker run \
 			Server = https://nafets227.github.io/archPackages/\\\$arch/\\\$repo
 			EOFPACMAN
 		sudo pacman -Sy &&
+		export LOGDEST=/home/builder/pkg
 		makepkg --noconfirm --log -s $@ </dev/null &&
 		makepkg --printsrcinfo >.SRCINFO
 		EOF

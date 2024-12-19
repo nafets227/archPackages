@@ -11,7 +11,7 @@ if [ -z "$1" ] ; then
 fi
 
 # config
-BUILDAURTAG=nafets227/build-aur-packages@v0.7.2 &&
+BUILDAURTAG=nafets227/build-aur-packages@v0.7.3 &&
 PLATFORM="$1" &&
 shift &&
 

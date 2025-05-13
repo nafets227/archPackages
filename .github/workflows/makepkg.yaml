@@ -63,7 +63,11 @@ jobs:
       continue-on-error: true
       run: |
         tar xvf artifact.tar
-        rm artifact.tar
+        rm -f \
+          artifact.tar \
+          *.pkg.tar.* \
+          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.files* \
+          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.db*
     - name: Build Packages
       id: build
       uses: nafets227/build-aur-packages@v0.8
@@ -109,18 +113,13 @@ jobs:
           https://github.com/VDR4arch/vdr4arch/vdr
           https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
           vdr-softhddevice-drm-gles
-    - name: add index.html and compatibility (x86_64 in root)
+    - name: add index.html
       if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       id: addindex
       run: |
         set -o pipefail
         cp -a src/index.html .
         rm -rf src
-        for f in "x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}"/*
-        do
-          rm "$(basename "$f")" || true # ignore error
-          ln -s "$f" "$(basename "$f")"
-        done
     - name: Upload Result (artifact.tar) as Workflow Artifact
       if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
       id: upload

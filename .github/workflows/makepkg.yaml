@@ -71,23 +71,23 @@ jobs:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         repodir: 'x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        missing_aur_dependencies: vdr
         packages: >
           blktrace
           dhtest
           dhtest-git
           dropwatch
-          perl-template-plugin-javascript
           shim-signed
           splunkforwarder
           td-agent
-          vdr-dummydevice
-          vdr-epgsearch
-          vdr-remote
-          vdr-satip
-          vdradmin-am
           virtio-win
-          xlogin
+          https://github.com/VDR4arch/vdr4arch/deps/perl-template-plugin-javascript
+          https://github.com/VDR4arch/vdr4arch/vdr
+          https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice
+          https://github.com/VDR4arch/vdr4arch/plugins/vdr-epgsearch
+          https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
+          https://github.com/VDR4arch/vdr4arch/plugins/vdr-satip
+          https://github.com/VDR4arch/vdr4arch/vdradmin-am
+          https://github.com/VDR4arch/vdr4arch/deps/xlogin
         #dummy2: >
         #  # these packages have different source than official AUR
         #  dhtest https://github.com/nafets227/dhtest.aur.git
@@ -105,9 +105,9 @@ jobs:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
         repodir: 'aarch64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        missing_aur_dependencies: vdr
         packages: >
-          vdr-remote
+          https://github.com/VDR4arch/vdr4arch/vdr
+          https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
           vdr-softhddevice-drm-gles
     - name: add index.html and compatibility (x86_64 in root)
       if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}

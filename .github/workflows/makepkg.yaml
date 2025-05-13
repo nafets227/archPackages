@@ -80,6 +80,7 @@ jobs:
           splunkforwarder
           td-agent
           virtio-win
+          https://github.com/nafets227/mkinitcpio-addon-rootloop
           https://github.com/VDR4arch/vdr4arch/deps/perl-template-plugin-javascript
           https://github.com/VDR4arch/vdr4arch/vdr
           https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice
@@ -88,10 +89,6 @@ jobs:
           https://github.com/VDR4arch/vdr4arch/plugins/vdr-satip
           https://github.com/VDR4arch/vdr4arch/vdradmin-am
           https://github.com/VDR4arch/vdr4arch/deps/xlogin
-        #dummy2: >
-        #  # these packages have different source than official AUR
-        #  dhtest https://github.com/nafets227/dhtest.aur.git
-        #  mkinitcpio-addon-rootloop https://github.com/nafets227/mkinitcpio-addon-rootloop
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
       with:

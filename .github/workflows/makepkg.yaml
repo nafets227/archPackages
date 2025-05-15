@@ -63,7 +63,11 @@ jobs:
       continue-on-error: true
       run: |
         tar xvf artifact.tar
-        rm artifact.tar
+        rm -f \
+          artifact.tar \
+          *.pkg.tar.* \
+          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.files* \
+          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.db*
     - name: Build Packages
       id: build
       uses: nafets227/build-aur-packages@gitrepo

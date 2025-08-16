@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Workflow Artifact (artifact.tar)
-      uses: actions/download-artifact@v4.3.0
+      uses: actions/download-artifact@v5.0.0
       with:
         name: github-pages
         path: ${{ github.workspace }}

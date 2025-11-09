@@ -70,7 +70,7 @@ jobs:
           ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.db*
     - name: Build Packages
       id: build
-      uses: nafets227/build-aur-packages@v0.8.2
+      uses: nafets227/build-aur-packages@dev
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
@@ -99,7 +99,7 @@ jobs:
         platforms: "arm64"
     - name: Build Packages for Raspberry
       id: build-raspi
-      uses: nafets227/build-aur-packages@v0.8.2
+      uses: nafets227/build-aur-packages@dev
       with:
         arch: "arm64"
         arch-override: true

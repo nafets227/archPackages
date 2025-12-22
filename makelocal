@@ -11,9 +11,18 @@ if [ -z "$1" ] ; then
 fi
 
 # config
-BUILDAURTAG=nafets227/build-aur-packages@v0.7.3 &&
 PLATFORM="$1" &&
 shift &&
+BUILDAURTAG=$(
+	grep "uses: .*build-aur-package" \
+		"$(dirname "${BASH_SOURCE[0]}")/.github/workflows/makepkg.yaml" \
+	| head -1 \
+	| sed 's/^.*uses: //'
+	)
+if [ -z "$BUILDAURTAG" ] ; then
+	printf "Error: Could not get BUILDAURTAG\n"
+	exit 1
+fi
 
 # common variables
 OURSELVES=$(basename "${BASH_SOURCE[0]}") &&
@@ -23,8 +32,8 @@ true || exit 1
 
 # clone or fetch+checkout build-aur-packages.
 if [ -d "$BUILDAURDIR" ] ; then
-	git -C "$BUILDAURDIR" fetch --depth 1 origin "${BUILDAURTAG##*@}" &&
-	git -C "$BUILDAURDIR" checkout --detach "${BUILDAURTAG##*@}" &&
+	git -C "$BUILDAURDIR" fetch origin "${BUILDAURTAG##*@}" &&
+	git -C "$BUILDAURDIR" checkout --detach "origin/${BUILDAURTAG##*@}" &&
 	true || exit 1
 else
 	mkdir -p "$BUILDAURDIR" &&

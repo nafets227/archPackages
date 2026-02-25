@@ -1,31 +1,31 @@
 ---
 name: "Build AUR package repository"
 description: >
-    Build a given list of AUR packages and store them in a repository.
+  Build a given list of AUR packages and store them in a repository.
 branding:
   icon: package
   color: blue
 inputs:
   packages:
     description: >
-        A string with a space separated list of aur packages that should
-        be built and included in the repository. Besides simple names of
-        aur packages (e.g. "go-do") you can also specify any git repo incl.
-        path (e.g.
-        https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice)
+      A string with a space separated list of aur packages that should
+      be built and included in the repository. Besides simple names of
+      aur packages (e.g. "go-do") you can also specify any git repo incl.
+      path (e.g.
+      https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice)
     required: true
   missing_pacman_dependencies:
     description: >
-        A string with a space separated list of dependencies that are not
-        correctly mentioned as dependencies in the PKGBUILD file and that
-        are available from pacman.
+      A string with a space separated list of dependencies that are not
+      correctly mentioned as dependencies in the PKGBUILD file and that
+      are available from pacman.
     required: false
     default: ""
   missing_aur_dependencies:
     description: >
-        A string with a space separated list of dependencies that are not
-        correctly mentioned as dependencies in the PKGBUILD file and that
-        are available from AUR.
+      A string with a space separated list of dependencies that are not
+      correctly mentioned as dependencies in the PKGBUILD file and that
+      are available from AUR.
     required: false
     default: ""
   reponame:
@@ -33,13 +33,13 @@ inputs:
       A string containing the name of the pacman repository to be used.
       Defaults to aurci2 for compatibility reasons.
     required: false
-    default: 'aurci2'
+    default: "aurci2"
   repodir:
     description: >
       A string containing the subdirectory under GITHUB_WORKSPACE where
       the packages will be stored. Can be empty, as per default.
     required: false
-    default: ''
+    default: ""
   keep:
     description: >
       A Boolean to tell if existing flags from github workspace directory

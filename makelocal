@@ -32,9 +32,17 @@ true || exit 1
 
 # clone or fetch+checkout build-aur-packages.
 if [ -d "$BUILDAURDIR" ] ; then
-	git -C "$BUILDAURDIR" fetch origin "${BUILDAURTAG##*@}" &&
-	git -C "$BUILDAURDIR" checkout --detach "origin/${BUILDAURTAG##*@}" &&
+	git -C "$BUILDAURDIR" fetch origin &&
+	git -C "$BUILDAURDIR" fetch origin --tags &&
 	true || exit 1
+	if git -C "$BUILDAURDIR" tag | grep --quiet "^${BUILDAURTAG##*@}\$" ; then
+		# $BUILDAURTAG is a tag, not a branch
+		git -C "$BUILDAURDIR" checkout --detach "${BUILDAURTAG##*@}" &&
+		true || exit 1
+	else
+		git -C "$BUILDAURDIR" checkout --detach "origin/${BUILDAURTAG##*@}" &&
+		true || exit 1
+	fi
 else
 	mkdir -p "$BUILDAURDIR" &&
 	git \

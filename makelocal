@@ -77,6 +77,17 @@ docker run \
 			SigLevel = Optional
 			Server = https://nafets227.github.io/archPackages/\\\$arch/\\\$repo
 			EOFPACMAN
+
+		if [ -d /home/builder/localpkg ] ; then
+			sudo bash -c "cat >>/etc/pacman.conf" <<-EOFPACMAN &&
+				[nafets227-local]
+				SigLevel = Optional
+				Server = file:///home/builder/localpkg
+				EOFPACMAN
+			repo-add "/home/builder/localpkg/nafets227-local.db.tar.gz" \
+				/home/builder/localpkg/*pkg*
+		fi
+		
 		sudo pacman -Sy &&
 		export LOGDEST=/home/builder/pkg
 		makepkg --noconfirm --log -s $@ </dev/null &&

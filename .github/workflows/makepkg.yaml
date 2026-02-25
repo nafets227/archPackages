@@ -68,9 +68,11 @@ jobs:
           *.pkg.tar.* \
           ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.files* \
           ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.db*
+    - name: debug ls
+      run: ls -laR
     - name: Build Packages
       id: build
-      uses: src/.github/actions/build-aur-packages
+      uses: ./src/.github/actions/build-aur-packages
       with:
         keep: true
         reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
@@ -99,7 +101,7 @@ jobs:
         platforms: "arm64"
     - name: Build Packages for Raspberry
       id: build-raspi
-      uses: src/.github/actions/build-aur-packages
+      uses: ./src/.github/actions/build-aur-packages
       with:
         arch: "arm64"
         arch-override: true

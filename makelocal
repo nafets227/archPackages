@@ -13,46 +13,17 @@ fi
 # config
 PLATFORM="$1" &&
 shift &&
-BUILDAURTAG=$(
-	grep "uses: .*build-aur-package" \
-		"$(dirname "${BASH_SOURCE[0]}")/.github/workflows/makepkg.yaml" \
-	| head -1 \
-	| sed 's/^.*uses: //'
-	)
-if [ -z "$BUILDAURTAG" ] ; then
-	printf "Error: Could not get BUILDAURTAG\n"
-	exit 1
-fi
 
 # common variables
 OURSELVES=$(basename "${BASH_SOURCE[0]}") &&
-BUILDAURDIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")/build-aur-package &&
-BUILDAURIMG="ghcr.io/nafets227/build-aur-packages:local-$OURSELVES"
+BUILDIMG="ghcr.io/nafets227/archpackages:local-$OURSELVES"
 true || exit 1
-
-# clone or fetch+checkout build-aur-packages.
-if [ -d "$BUILDAURDIR" ] ; then
-	git -C "$BUILDAURDIR" fetch origin "${BUILDAURTAG##*@}" &&
-	git -C "$BUILDAURDIR" checkout --detach "origin/${BUILDAURTAG##*@}" &&
-	true || exit 1
-else
-	mkdir -p "$BUILDAURDIR" &&
-	git \
-		-c advice.detachedHead=false \
-		clone \
-		--depth 1 \
-		"https://github.com/${BUILDAURTAG%@*}" \
-		--branch "${BUILDAURTAG##*@}" \
-		"$BUILDAURDIR" \
-		&&
-	true || exit 1
-fi
 
 # Build our builder image
 docker build \
-	-t "$BUILDAURIMG" \
+	-t "$BUILDIMG" \
 	--platform "$PLATFORM" \
-	"$BUILDAURDIR" \
+	"$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.github/actions/build-aur-packages" \
 	&&
 
 # finally run makepkg inside the builder image
@@ -61,7 +32,7 @@ docker run \
 	-v "$PWD:/home/builder" \
 	-i \
 	--user 1000 \
-	"$BUILDAURIMG" \
+	"$BUILDIMG" \
 	bash <<-EOF
 		cd &&
 		sudo bash -c "cat >>/etc/pacman.conf" <<-EOFPACMAN &&

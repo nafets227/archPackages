@@ -6,3 +6,9 @@ updates:
       interval: "daily"
     assignees:
       - "nafets227"
+  - package-ecosystem: "docker" # See documentation for possible values
+    directory: "/.github/actions/build-aur-packages" # Location of package manifests
+    schedule:
+      interval: "daily"
+    assignees:
+      - "nafets227"

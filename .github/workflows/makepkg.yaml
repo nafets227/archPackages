@@ -1,11 +1,14 @@
+---
 name: Make Archlinux Package Repository
+
+permissions: {}
 
 on:
   push:
     branches:
-    - '**'
+      - "**"
     tags-ignore:
-    - '**'
+      - "**"
   schedule:
     - cron: "37 5 * * *"
   # Allows you to run this workflow manually from the Actions tab
@@ -20,142 +23,170 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      updated: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
+      updated: >-
+        ${{ ( steps.build.outputs.updated == 'true' ) ||
+        ( steps.build-raspi.outputs.updated == 'true' ) }}
       branch-prefix: ${{ steps.init.outputs.branch-prefix }}
       date: ${{ steps.init.outputs.date}}
     steps:
-    - name: Setup CA trust as workaround
-      # prior to 25.2.2026 this has been standard, unclear why
-      # it needs to be explicitly configured on the runner.
-      run: sudo update-ca-certificates
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        path: "src"
-    - name: Analyse
-      id: init
-      run: |
-        set -o pipefail
-        if [ "${{ github.ref_name }}" == "${{ github.event.repository.default_branch }}" ] ; then
-          branch_prefix=
-        else
-          branch_prefix="${{ github.ref_name }}-"
-        fi
-        reponame="${GITHUB_REPOSITORY##*/}"
-        branch_prev=$(git -C src tag -l "${branch_prefix}2*" | tail -1)
-        tag_date="$(date +'%Y%m%d-%H%M%S')"
-        echo "Date used for tagging: $tag_date"
-        echo "Repo name: $reponame"
-        echo "Branch prefix: $branch_prefix"
-        echo "Previous release: $branch_prev"
-        echo "date=$tag_date" >>$GITHUB_OUTPUT
-        echo "reponame=$reponame" >>$GITHUB_OUTPUT
-        echo "branch-prefix=$branch_prefix" >>$GITHUB_OUTPUT
-        echo "branch-prev=$branch_prev" >>$GITHUB_OUTPUT
-    - name: download previous release
-      id: download
-      if: ${{ steps.init.outputs.branch-prev != '' }}
-      continue-on-error: true
-      uses: robinraju/release-downloader@v1.12
-      with:
-        tag: ${{ steps.init.outputs.branch-prev }}
-        fileName: "artifact.tar"
-    - name: extract previous release
-      id: extract
-      if: ${{ steps.init.outputs.branch-prev != '' }}
-      continue-on-error: true
-      run: |
-        tar xvf artifact.tar
-        rm -f \
-          artifact.tar \
-          *.pkg.tar.* \
-          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.files* \
-          ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}.db*
-    - name: Build Packages
-      id: build
-      uses: ./src/.github/actions/build-aur-packages
-      with:
-        keep: true
-        reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        repodir: 'x86_64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        packages: >
-          blktrace
-          dhtest
-          dhtest-git
-          dropwatch
-          shim-signed
-          splunkforwarder
-          td-agent
-          virtio-win
-          https://github.com/nafets227/mkinitcpio-addon-rootloop
-          https://github.com/VDR4arch/vdr4arch/deps/perl-template-plugin-javascript
-          https://github.com/VDR4arch/vdr4arch/vdr
-          https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice
-          https://github.com/VDR4arch/vdr4arch/plugins/vdr-epgsearch
-          https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
-          https://github.com/VDR4arch/vdr4arch/plugins/vdr-satip
-          https://github.com/VDR4arch/vdr4arch/vdradmin-am
-          https://github.com/VDR4arch/vdr4arch/deps/xlogin
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: "arm64"
-    - name: Build Packages for Raspberry
-      id: build-raspi
-      uses: ./src/.github/actions/build-aur-packages
-      with:
-        arch: "arm64"
-        arch-override: true
-        keep: true
-        reponame: '${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        repodir: 'aarch64/${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}'
-        packages: >
-          https://github.com/VDR4arch/vdr4arch/vdr
-          https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
-          vdr-softhddevice-drm-gles
-    - name: add index.html
-      if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
-      id: addindex
-      run: |
-        set -o pipefail
-        cp -a src/index.html .
-        rm -rf src
-    - name: Upload Result (artifact.tar) as Workflow Artifact
-      if: ${{ ( steps.build.outputs.updated == 'true' ) || ( steps.build-raspi.outputs.updated == 'true' ) }}
-      id: upload
-      uses: actions/upload-pages-artifact@v4.0.0
-      with:
-        path: ${{ github.workspace }}
-
+      - name: Setup CA trust as workaround
+        # prior to 25.2.2026 this has been standard, unclear why
+        # it needs to be explicitly configured on the runner.
+        run: sudo update-ca-certificates
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          path: "src"
+          persist-credentials: false
+      - name: Analyse
+        id: init
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          DEFBR: ${{ github.event.repository.default_branch }}
+        run: |
+          set -o pipefail
+          if [ "$REF_NAME" == "$DEFBR" ] ; then
+            branch_prefix=
+          else
+            branch_prefix="${REF_NAME}-"
+          fi
+          reponame="${GITHUB_REPOSITORY##*/}"
+          branch_prev=$(git -C src tag -l "${branch_prefix}2*" | tail -1)
+          tag_date="$(date +'%Y%m%d-%H%M%S')"
+          echo "Date used for tagging: $tag_date"
+          echo "Repo name: $reponame"
+          echo "Branch prefix: $branch_prefix"
+          echo "Previous release: $branch_prev"
+          {
+            echo "date=$tag_date"
+            echo "reponame=$reponame"
+            echo "branch-prefix=$branch_prefix"
+            echo "branch-prev=$branch_prev"
+          } >>"$GITHUB_OUTPUT"
+      - name: download previous release
+        id: download
+        if: ${{ steps.init.outputs.branch-prev != '' }}
+        continue-on-error: true
+        uses: robinraju/release-downloader@v1.12
+        with:
+          tag: ${{ steps.init.outputs.branch-prev }}
+          fileName: "artifact.tar"
+      - name: extract previous release
+        id: extract
+        if: ${{ steps.init.outputs.branch-prev != '' }}
+        continue-on-error: true
+        env:
+          REP_OWN: ${{ github.repository_owner }}
+          REPNAME: ${{ steps.init.outputs.reponame }}
+        run: |
+          tar xvf artifact.tar
+          rm -f \
+            artifact.tar \
+            ./*.pkg.tar.* \
+            "./$REP_OWN-$REPNAME.files"* \
+            "./$REP_OWN-$REPNAME.db"*
+      - name: Build Packages
+        id: build
+        uses: ./src/.github/actions/build-aur-packages
+        with:
+          keep: true
+          reponame: >-
+            ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}
+          repodir: "x86_64/${{ github.repository_owner }}-\
+            ${{ steps.init.outputs.reponame }}"
+          # editorconfig-checker-disable
+          packages: >
+            blktrace
+            dhtest
+            dhtest-git
+            dropwatch
+            shim-signed
+            splunkforwarder
+            td-agent
+            virtio-win
+            https://github.com/nafets227/mkinitcpio-addon-rootloop
+            https://github.com/VDR4arch/vdr4arch/deps/perl-template-plugin-javascript
+            https://github.com/VDR4arch/vdr4arch/vdr
+            https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice
+            https://github.com/VDR4arch/vdr4arch/plugins/vdr-epgsearch
+            https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
+            https://github.com/VDR4arch/vdr4arch/plugins/vdr-satip
+            https://github.com/VDR4arch/vdr4arch/vdradmin-am
+            https://github.com/VDR4arch/vdr4arch/deps/xlogin
+          # editorconfig-checker-enable
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: "arm64"
+      - name: Build Packages for Raspberry
+        id: build-raspi
+        uses: ./src/.github/actions/build-aur-packages
+        with:
+          arch: "arm64"
+          arch-override: true
+          keep: true
+          reponame: >-
+            ${{ github.repository_owner }}-${{ steps.init.outputs.reponame }}
+          repodir: "aarch64/${{ github.repository_owner }}-\
+            ${{ steps.init.outputs.reponame }}"
+          packages: >
+            https://github.com/VDR4arch/vdr4arch/vdr
+            https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
+            vdr-softhddevice-drm-gles
+      - name: add index.html
+        if: >
+          ( steps.build.outputs.updated == 'true' ) ||
+          ( steps.build-raspi.outputs.updated == 'true' )
+        id: addindex
+        run: |
+          set -o pipefail
+          cp -a src/index.html .
+          rm -rf src
+      - name: Upload Result (artifact.tar) as Workflow Artifact
+        if: >
+          ( steps.build.outputs.updated == 'true' ) ||
+          ( steps.build-raspi.outputs.updated == 'true' )
+        id: upload
+        uses: actions/upload-pages-artifact@v4.0.0
+        with:
+          path: ${{ github.workspace }}
 
   release:
+    permissions:
+      contents: write
     needs: build
-    if: ${{ needs.build.outputs.updated == 'true' && github.actor != 'dependabot[bot]' }}
+    if: >
+      needs.build.outputs.updated == 'true' &&
+      github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-    - name: Download Workflow Artifact (artifact.tar)
-      uses: actions/download-artifact@v7.0.0
-      with:
-        name: github-pages
-        path: ${{ github.workspace }}
-    - name: Upload File (artifact.tar) to Release
-      uses: softprops/action-gh-release@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: "${{ needs.build.outputs.branch-prefix }}${{ needs.build.outputs.date }}"
-        body: ${{ github.repository }} build ${{ github.run_number }} for ${{ github.ref_name }} from ${{ needs.build.outputs.date }}
-        files: |
-          ${{ github.workspace }}/artifact.tar
-        prerelease: ${{ needs.build.outputs.branch-prefix != '' }}
-        target_commitish: ${{ github.ref_name }}
-
+      - name: Download Workflow Artifact (artifact.tar)
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: github-pages
+          path: ${{ github.workspace }}
+      - name: Upload File (artifact.tar) to Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ needs.build.outputs.branch-prefix }}\
+            ${{ needs.build.outputs.date }}"
+          body: >-
+            ${{ github.repository }}
+            build ${{ github.run_number }}
+            for ${{ github.ref_name }}
+            from ${{ needs.build.outputs.date }}
+          files: |
+            ${{ github.workspace }}/artifact.tar
+          prerelease: ${{ needs.build.outputs.branch-prefix != '' }}
+          target_commitish: ${{ github.ref_name }}
 
   deploy-ghpages:
     needs: build
     if: ${{ needs.build.outputs.updated == 'true' &&
-            github.ref_name == github.event.repository.default_branch }}
+      github.ref_name == github.event.repository.default_branch }}
     # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read
@@ -171,15 +202,20 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-    - name: Setup Pages
-      id: setup
-      uses: actions/configure-pages@v5
-    - name: Deploy to GitHub Pages
-      id: deploy
-      uses: actions/deploy-pages@v4
+      - name: Setup Pages
+        id: setup
+        uses: actions/configure-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
 
   _github_lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+      statuses: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -202,51 +238,52 @@ jobs:
   test_simplebuild:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup CA trust as workaround
-      # prior to 25.2.2026 this has been standard, unclear why
-      # it needs to be explicitly configured on the runner.
-      run: sudo update-ca-certificates
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        path: "src"
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: "arm64"
-    - name: Build Packages amd64
-      uses: ./src/.github/actions/build-aur-packages
-      with:
-        packages: >
-          go-do
-          ttf-monocode
-    - name: Build Packages arm64
-      uses: ./src/.github/actions/build-aur-packages
-      with:
-        arch: "arm64"
-        arch-override: true
-        packages: >
-          go-do
-          ttf-monocode
-    - name: List and verify generated Files
-      run: |
-        find . -ls | tee ${{ github.workspace }}/files.txt
-        RC=0
-        for s in \
-          "go-do-*-x86_64.pkg.tar*" \
-          "ttf-monocode-*-any.pkg.tar*" \
-          "go-do-*-aarch64.pkg.tar*" \
-          ;
-        do
-          for f in $s ; do
-            if [ ! -f "$f" ] ; then
-              echo "$s not found"
-              RC=1
-            else
-              break
-            fi
+      - name: Setup CA trust as workaround
+        # prior to 25.2.2026 this has been standard, unclear why
+        # it needs to be explicitly configured on the runner.
+        run: sudo update-ca-certificates
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          path: "src"
+          persist-credentials: false
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: "arm64"
+      - name: Build Packages amd64
+        uses: ./src/.github/actions/build-aur-packages
+        with:
+          packages: >
+            go-do
+            ttf-monocode
+      - name: Build Packages arm64
+        uses: ./src/.github/actions/build-aur-packages
+        with:
+          arch: "arm64"
+          arch-override: true
+          packages: >
+            go-do
+            ttf-monocode
+      - name: List and verify generated Files
+        run: |
+          find . -ls | tee ${{ github.workspace }}/files.txt
+          RC=0
+          for s in \
+            "go-do-*-x86_64.pkg.tar*" \
+            "ttf-monocode-*-any.pkg.tar*" \
+            "go-do-*-aarch64.pkg.tar*" \
+            ;
+          do
+            for f in $s ; do
+              if [ ! -f "$f" ] ; then
+                echo "$s not found"
+                RC=1
+              else
+                break
+              fi
+            done
           done
-        done
 
-        exit $RC
+          exit $RC

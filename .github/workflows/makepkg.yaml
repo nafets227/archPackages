@@ -153,6 +153,8 @@ jobs:
           path: ${{ github.workspace }}
 
   release:
+    permissions:
+      contents: write
     needs: build
     if: >
       needs.build.outputs.updated == 'true' &&

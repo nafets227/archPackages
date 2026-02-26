@@ -6,7 +6,7 @@
 #    2ff - further parameters are handed over to makepkg.
 #          Common examples are -f --force --ignorearch
 if [ -z "$1" ] ; then
-	printf "Error: Missing platform (parm 1)\n"
+	printf "Error: Missing platform (param 1)\n"
 	exit 1
 fi
 
@@ -20,10 +20,11 @@ BUILDIMG="ghcr.io/nafets227/archpackages:local-$OURSELVES"
 true || exit 1
 
 # Build our builder image
+PRJDIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 docker build \
 	-t "$BUILDIMG" \
 	--platform "$PLATFORM" \
-	"$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.github/actions/build-aur-packages" \
+	"$PRJDIR/.github/actions/build-aur-packages" \
 	&&
 
 # finally run makepkg inside the builder image
@@ -50,7 +51,7 @@ docker run \
 			repo-add "/home/builder/localpkg/nafets227-local.db.tar.gz" \
 				/home/builder/localpkg/*pkg*
 		fi
-		
+
 		sudo pacman -Sy &&
 		export LOGDEST=/home/builder/pkg
 		makepkg --noconfirm --log -s $@ </dev/null &&

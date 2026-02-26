@@ -16,15 +16,15 @@ jobs:
   build_repository:
     runs-on: ubuntu-latest
     steps:
-    - name: Build Packages
-      uses: nafets227build-aur-packages
-      with:
-        packages: >
-          azure-cli
-          kwallet-git
-          micronucleus-git
-        missing_pacman_dependencies: >
-          libusb-compat
+      - name: Build Packages
+        uses: nafets227build-aur-packages
+        with:
+          packages: >
+            azure-cli
+            kwallet-git
+            micronucleus-git
+          missing_pacman_dependencies: >
+            libusb-compat
 ```
 
 This example will build packages
@@ -50,7 +50,7 @@ Docker image
 
 ```shell
     docker build -t builder .
-````
+```
 
 then run it, passing the packages as environment variables.
 The names of the variables are derived from the `action.yaml`.

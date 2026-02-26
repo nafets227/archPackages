@@ -1,8 +1,9 @@
+---
 # Config for zizmor Linter inside SuperLinter
 rules:
   unpinned-uses:
     ignore:
-      - main.yml
+      - makepkg.yaml
   dependabot-cooldown:
     ignore:
       - dependabot.yaml

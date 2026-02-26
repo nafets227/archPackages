@@ -24,6 +24,10 @@ jobs:
       branch-prefix: ${{ steps.init.outputs.branch-prefix }}
       date: ${{ steps.init.outputs.date}}
     steps:
+    - name: Setup CA trust as workaround
+      # prior to 25.2.2026 this has been standard, unclear why
+      # it needs to be explicitly configured on the runner.
+      run: sudo update-ca-certificates
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
@@ -177,6 +181,10 @@ jobs:
   test_simplebuild:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup CA trust as workaround
+      # prior to 25.2.2026 this has been standard, unclear why
+      # it needs to be explicitly configured on the runner.
+      run: sudo update-ca-certificates
     - name: Checkout repository
       uses: actions/checkout@v6
       with:

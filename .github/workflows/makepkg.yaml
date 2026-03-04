@@ -116,7 +116,7 @@ jobs:
             https://github.com/VDR4arch/vdr4arch/deps/xlogin
           # editorconfig-checker-enable
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: "arm64"
       - name: Build Packages for Raspberry
@@ -249,7 +249,7 @@ jobs:
           path: "src"
           persist-credentials: false
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: "arm64"
       - name: Build Packages amd64

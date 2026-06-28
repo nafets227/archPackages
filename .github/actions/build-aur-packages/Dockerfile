@@ -21,13 +21,13 @@
 	# DL3007 warning: Using latest is prone to errors if the image will ever
 	#        update. Pin the version explicitly to a release tag
 
-FROM archlinux:base-devel AS base-linux-amd64
+FROM ghcr.io/nafets227/tools/archdocker:latest AS base-linux-amd64
 ENV ARCHLINUX_ARG=x86_64
 
-FROM menci/archlinuxarm:base-devel AS base-linux-arm64
+FROM ghcr.io/nafets227/tools/archdocker:latest AS base-linux-arm64
 ENV ARCHLINUX_ARG=aarch64
-RUN \
-	sed -i 's/CheckSpace/#CheckSpace/' /etc/pacman.conf
+#RUN \
+#	sed -i 's/CheckSpace/#CheckSpace/' /etc/pacman.conf
 
 FROM base-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}
 
@@ -39,7 +39,7 @@ FROM base-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}
 RUN \
 	sed -i 's/#DisableSandbox/DisableSandbox/' /etc/pacman.conf && \
 	pacman-key --init && \
-	pacman -Syu --noconfirm --needed sudo expect pacutils git && \
+	pacman -Syu --noconfirm --needed base-devel sudo expect pacutils git && \
 	groupadd builder && \
 	useradd -m -g builder builder && \
 	echo 'builder ALL = NOPASSWD: ALL' > /etc/sudoers.d/builder_pacman

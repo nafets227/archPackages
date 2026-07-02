@@ -97,23 +97,15 @@ jobs:
             ${{ steps.init.outputs.reponame }}"
           # editorconfig-checker-disable
           packages: >
-            blktrace
             dhtest
             dhtest-git
-            dropwatch
-            shim-signed
-            splunkforwarder
-            td-agent
             virtio-win
-            https://github.com/nafets227/mkinitcpio-addon-rootloop
-            https://github.com/VDR4arch/vdr4arch/deps/perl-template-plugin-javascript
             https://github.com/VDR4arch/vdr4arch/vdr
             https://github.com/VDR4arch/vdr4arch/plugins/vdr-dummydevice
             https://github.com/VDR4arch/vdr4arch/plugins/vdr-epgsearch
             https://github.com/VDR4arch/vdr4arch/plugins/vdr-remote
             https://github.com/VDR4arch/vdr4arch/plugins/vdr-satip
             https://github.com/VDR4arch/vdr4arch/vdradmin-am
-            https://github.com/VDR4arch/vdr4arch/deps/xlogin
           # editorconfig-checker-enable
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4

@@ -229,7 +229,7 @@ jobs:
 
   test_simplebuild:
     runs-on: ubuntu-latest
-    steps:
+    steps: # jscpd:ignore-start
       - name: Setup CA trust as workaround
         # prior to 25.2.2026 this has been standard, unclear why
         # it needs to be explicitly configured on the runner.
@@ -240,6 +240,7 @@ jobs:
           fetch-depth: 0
           path: "src"
           persist-credentials: false
+          # jscpd:ignore-end
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:

@@ -159,7 +159,8 @@ jobs:
           name: github-pages
           path: ${{ github.workspace }}
       - name: Upload File (artifact.tar) to Release
-        uses: softprops/action-gh-release@v3
+        #editorconfig-checker-disable-next-line
+        uses: softprops/action-gh-release@v3 # zizmor: ignore[superfluous-actions]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

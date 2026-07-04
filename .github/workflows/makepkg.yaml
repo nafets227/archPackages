@@ -159,7 +159,8 @@ jobs:
           name: github-pages
           path: ${{ github.workspace }}
       - name: Upload File (artifact.tar) to Release
-        uses: softprops/action-gh-release@v3
+        #editorconfig-checker-disable-next-line
+        uses: softprops/action-gh-release@v3 # zizmor: ignore[superfluous-actions]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -216,7 +217,7 @@ jobs:
           persist-credentials: false
 
       - name: SuperLint
-        uses: super-linter/super-linter/slim@v8.5.0
+        uses: super-linter/super-linter/slim@v8.7.0
         env:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_SHELL_SHFMT: false
@@ -229,7 +230,7 @@ jobs:
 
   test_simplebuild:
     runs-on: ubuntu-latest
-    steps:
+    steps: # jscpd:ignore-start
       - name: Setup CA trust as workaround
         # prior to 25.2.2026 this has been standard, unclear why
         # it needs to be explicitly configured on the runner.
@@ -240,6 +241,7 @@ jobs:
           fetch-depth: 0
           path: "src"
           persist-credentials: false
+          # jscpd:ignore-end
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:

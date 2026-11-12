@@ -88,7 +88,7 @@ jobs:
             "./$REP_OWN-$REPNAME.db"*
       - name: Build Packages
         id: build
-        uses: ./src/.github/actions/build-aur-packages
+        uses: $/.github/actions/build-aur-packages
         with:
           keep: true
           reponame: >-
@@ -113,7 +113,7 @@ jobs:
           platforms: "arm64"
       - name: Build Packages for Raspberry
         id: build-raspi
-        uses: ./src/.github/actions/build-aur-packages
+        uses: $/.github/actions/build-aur-packages
         with:
           arch: "arm64"
           arch-override: true
@@ -217,7 +217,7 @@ jobs:
           persist-credentials: false
 
       - name: SuperLint
-        uses: super-linter/super-linter/slim@v8.7.0
+        uses: super-linter/super-linter/slim@v9.0.0
         env:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_SHELL_SHFMT: false
@@ -247,13 +247,13 @@ jobs:
         with:
           platforms: "arm64"
       - name: Build Packages amd64
-        uses: ./src/.github/actions/build-aur-packages
+        uses: $/.github/actions/build-aur-packages
         with:
           packages: >
             go-do
             ttf-monocode
       - name: Build Packages arm64
-        uses: ./src/.github/actions/build-aur-packages
+        uses: $/.github/actions/build-aur-packages
         with:
           arch: "arm64"
           arch-override: true
